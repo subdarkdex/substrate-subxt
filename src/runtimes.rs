@@ -17,25 +17,14 @@
 use codec::Encode;
 use sp_runtime::{
     generic::Header,
-    traits::{
-        BlakeTwo256,
-        IdentifyAccount,
-        Verify,
-    },
-    MultiSignature,
-    OpaqueExtrinsic,
+    traits::{BlakeTwo256, IdentifyAccount, Verify},
+    MultiSignature, OpaqueExtrinsic,
 };
 
 use crate::{
-    extrinsic::{
-        DefaultExtra,
-        SignedExtra,
-    },
+    extrinsic::{DefaultExtra, SignedExtra},
     frame::{
-        balances::{
-            AccountData,
-            Balances,
-        },
+        balances::{AccountData, Balances},
         contracts::Contracts,
         sudo::Sudo,
         system::System,

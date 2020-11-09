@@ -14,25 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with substrate-subxt.  If not, see <http://www.gnu.org/licenses/>.
 
-use codec::{
-    Decode,
-    Encode,
-};
-use core::{
-    fmt::Debug,
-    marker::PhantomData,
-};
+use codec::{Decode, Encode};
+use core::{fmt::Debug, marker::PhantomData};
 use sp_runtime::{
-    generic::Era,
-    traits::SignedExtension,
-    transaction_validity::TransactionValidityError,
+    generic::Era, traits::SignedExtension, transaction_validity::TransactionValidityError,
 };
 
 use crate::{
-    frame::{
-        balances::Balances,
-        system::System,
-    },
+    frame::{balances::Balances, system::System},
     runtimes::Runtime,
 };
 
@@ -233,12 +222,7 @@ pub trait SignedExtra<T: System>: SignedExtension {
     type Extra: SignedExtension + Send + Sync;
 
     /// Creates a new `SignedExtra`.
-    fn new(
-        spec_version: u32,
-        tx_version: u32,
-        nonce: T::Index,
-        genesis_hash: T::Hash,
-    ) -> Self;
+    fn new(spec_version: u32, nonce: T::Index, genesis_hash: T::Hash) -> Self;
 
     /// Returns the transaction extra.
     fn extra(&self) -> Self::Extra;
@@ -248,7 +232,6 @@ pub trait SignedExtra<T: System>: SignedExtension {
 #[derive(Encode, Decode, Clone, Eq, PartialEq, Debug)]
 pub struct DefaultExtra<T: System> {
     spec_version: u32,
-    tx_version: u32,
     nonce: T::Index,
     genesis_hash: T::Hash,
 }
@@ -258,7 +241,6 @@ impl<T: System + Balances + Clone + Debug + Eq + Send + Sync> SignedExtra<T>
 {
     type Extra = (
         CheckSpecVersion<T>,
-        CheckTxVersion<T>,
         CheckGenesis<T>,
         CheckEra<T>,
         CheckNonce<T>,
@@ -266,15 +248,9 @@ impl<T: System + Balances + Clone + Debug + Eq + Send + Sync> SignedExtra<T>
         ChargeTransactionPayment<T>,
     );
 
-    fn new(
-        spec_version: u32,
-        tx_version: u32,
-        nonce: T::Index,
-        genesis_hash: T::Hash,
-    ) -> Self {
+    fn new(spec_version: u32, nonce: T::Index, genesis_hash: T::Hash) -> Self {
         DefaultExtra {
             spec_version,
-            tx_version,
             nonce,
             genesis_hash,
         }
@@ -283,7 +259,6 @@ impl<T: System + Balances + Clone + Debug + Eq + Send + Sync> SignedExtra<T>
     fn extra(&self) -> Self::Extra {
         (
             CheckSpecVersion(PhantomData, self.spec_version),
-            CheckTxVersion(PhantomData, self.tx_version),
             CheckGenesis(PhantomData, self.genesis_hash),
             CheckEra((Era::Immortal, PhantomData), self.genesis_hash),
             CheckNonce(self.nonce),

@@ -20,26 +20,14 @@ mod extra;
 mod signer;
 
 pub use self::{
-    extra::{
-        DefaultExtra,
-        Extra,
-        SignedExtra,
-    },
-    signer::{
-        PairSigner,
-        Signer,
-    },
+    extra::{DefaultExtra, Extra, SignedExtra},
+    signer::{PairSigner, Signer},
 };
 
 use sp_runtime::traits::SignedExtension;
 use sp_version::RuntimeVersion;
 
-use crate::{
-    frame::system::System,
-    runtimes::Runtime,
-    Encoded,
-    Error,
-};
+use crate::{frame::system::System, runtimes::Runtime, Encoded, Error};
 
 /// UncheckedExtrinsic type.
 pub type UncheckedExtrinsic<T> = sp_runtime::generic::UncheckedExtrinsic<
@@ -66,8 +54,7 @@ where
         Send + Sync,
 {
     let spec_version = runtime_version.spec_version;
-    let tx_version = runtime_version.transaction_version;
-    let extra: T::Extra = T::Extra::new(spec_version, tx_version, nonce, genesis_hash);
+    let extra: T::Extra = T::Extra::new(spec_version, nonce, genesis_hash);
     let payload = SignedPayload::<T>::new(call, extra.extra())?;
     let signed = signer.sign(payload).await?;
     Ok(signed)
