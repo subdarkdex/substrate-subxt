@@ -222,7 +222,12 @@ pub trait SignedExtra<T: System>: SignedExtension {
     type Extra: SignedExtension + Send + Sync;
 
     /// Creates a new `SignedExtra`.
-    fn new(spec_version: u32, nonce: T::Index, genesis_hash: T::Hash) -> Self;
+    fn new(
+        spec_version: u32,
+        tx_version: u32,
+        nonce: T::Index,
+        genesis_hash: T::Hash,
+    ) -> Self;
 
     /// Returns the transaction extra.
     fn extra(&self) -> Self::Extra;
@@ -248,7 +253,12 @@ impl<T: System + Balances + Clone + Debug + Eq + Send + Sync> SignedExtra<T>
         ChargeTransactionPayment<T>,
     );
 
-    fn new(spec_version: u32, nonce: T::Index, genesis_hash: T::Hash) -> Self {
+    fn new(
+        spec_version: u32,
+        _tx_version: u32,
+        nonce: T::Index,
+        genesis_hash: T::Hash,
+    ) -> Self {
         DefaultExtra {
             spec_version,
             nonce,
@@ -272,6 +282,72 @@ impl<T: System + Balances + Clone + Debug + Eq + Send + Sync> SignedExtension
     for DefaultExtra<T>
 {
     const IDENTIFIER: &'static str = "DefaultExtra";
+    type AccountId = T::AccountId;
+    type Call = ();
+    type AdditionalSigned =
+        <<Self as SignedExtra<T>>::Extra as SignedExtension>::AdditionalSigned;
+    type Pre = ();
+
+    fn additional_signed(
+        &self,
+    ) -> Result<Self::AdditionalSigned, TransactionValidityError> {
+        self.extra().additional_signed()
+    }
+}
+
+/// Default `SignedExtra` for substrate runtimes.
+#[derive(Encode, Decode, Clone, Eq, PartialEq, Debug)]
+pub struct RelayExtra<T: System> {
+    spec_version: u32,
+    tx_version: u32,
+    nonce: T::Index,
+    genesis_hash: T::Hash,
+}
+
+impl<T: System + Balances + Clone + Debug + Eq + Send + Sync> SignedExtra<T>
+    for RelayExtra<T>
+{
+    type Extra = (
+        CheckSpecVersion<T>,
+        CheckTxVersion<T>,
+        CheckGenesis<T>,
+        CheckEra<T>,
+        CheckNonce<T>,
+        CheckWeight<T>,
+        ChargeTransactionPayment<T>,
+    );
+
+    fn new(
+        spec_version: u32,
+        tx_version: u32,
+        nonce: T::Index,
+        genesis_hash: T::Hash,
+    ) -> Self {
+        RelayExtra {
+            spec_version,
+            tx_version,
+            nonce,
+            genesis_hash,
+        }
+    }
+
+    fn extra(&self) -> Self::Extra {
+        (
+            CheckSpecVersion(PhantomData, self.spec_version),
+            CheckTxVersion(PhantomData, self.tx_version),
+            CheckGenesis(PhantomData, self.genesis_hash),
+            CheckEra((Era::Immortal, PhantomData), self.genesis_hash),
+            CheckNonce(self.nonce),
+            CheckWeight(PhantomData),
+            ChargeTransactionPayment(<T as Balances>::Balance::default()),
+        )
+    }
+}
+
+impl<T: System + Balances + Clone + Debug + Eq + Send + Sync> SignedExtension
+    for RelayExtra<T>
+{
+    const IDENTIFIER: &'static str = "RelayExtra";
     type AccountId = T::AccountId;
     type Call = ();
     type AdditionalSigned =

@@ -22,7 +22,7 @@ use sp_runtime::{
 };
 
 use crate::{
-    extrinsic::{DefaultExtra, SignedExtra},
+    extrinsic::{DefaultExtra, RelayExtra, SignedExtra},
     frame::{
         balances::{AccountData, Balances},
         contracts::Contracts,
@@ -73,6 +73,11 @@ impl Contracts for DefaultNodeRuntime {}
 
 impl Sudo for DefaultNodeRuntime {}
 
+/// Assets type
+pub trait Assets: System {
+    /// The balance of an account.
+    type AssetId: codec::Codec + Default + Copy;
+}
 /// Concrete type definitions compatible with the node template.
 ///
 /// # Note
@@ -103,6 +108,10 @@ impl Balances for NodeTemplateRuntime {
     type Balance = u128;
 }
 
+impl Assets for NodeTemplateRuntime {
+    type AssetId = u32;
+}
+
 impl Sudo for NodeTemplateRuntime {}
 
 /// Concrete type definitions compatible with those for kusama, v0.7
@@ -116,7 +125,7 @@ pub struct KusamaRuntime;
 
 impl Runtime for KusamaRuntime {
     type Signature = MultiSignature;
-    type Extra = DefaultExtra<Self>;
+    type Extra = RelayExtra<Self>;
 }
 
 impl System for KusamaRuntime {

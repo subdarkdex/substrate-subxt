@@ -20,7 +20,7 @@ mod extra;
 mod signer;
 
 pub use self::{
-    extra::{DefaultExtra, Extra, SignedExtra},
+    extra::{DefaultExtra, Extra, RelayExtra, SignedExtra},
     signer::{PairSigner, Signer},
 };
 
@@ -54,7 +54,8 @@ where
         Send + Sync,
 {
     let spec_version = runtime_version.spec_version;
-    let extra: T::Extra = T::Extra::new(spec_version, nonce, genesis_hash);
+    let tx_version = runtime_version.transaction_version;
+    let extra: T::Extra = T::Extra::new(spec_version, tx_version, nonce, genesis_hash);
     let payload = SignedPayload::<T>::new(call, extra.extra())?;
     let signed = signer.sign(payload).await?;
     Ok(signed)
