@@ -14,18 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with substrate-subxt.  If not, see <http://www.gnu.org/licenses/>.
 
-use crate::{
-    chain_spec,
-    cli::Cli,
-    service,
-    service::new_full_params,
-};
-use sc_cli::{
-    ChainSpec,
-    Role,
-    RuntimeVersion,
-    SubstrateCli,
-};
+use crate::{chain_spec, cli::Cli, service, service::new_full_params};
+use sc_cli::{ChainSpec, Role, RuntimeVersion, SubstrateCli};
 use sc_service::ServiceParams;
 
 impl SubstrateCli for Cli {
@@ -57,11 +47,9 @@ impl SubstrateCli for Cli {
         Ok(match id {
             "dev" => Box::new(chain_spec::development_config()?),
             "" | "local" => Box::new(chain_spec::local_testnet_config()?),
-            path => {
-                Box::new(chain_spec::ChainSpec::from_json_file(
-                    std::path::PathBuf::from(path),
-                )?)
-            }
+            path => Box::new(chain_spec::ChainSpec::from_json_file(
+                std::path::PathBuf::from(path),
+            )?),
         })
     }
 

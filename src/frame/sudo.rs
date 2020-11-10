@@ -17,10 +17,7 @@
 //! Implements support for the frame_sudo module.
 
 use crate::{
-    frame::system::{
-        System,
-        SystemEventsDecoder,
-    },
+    frame::system::{System, SystemEventsDecoder},
     Encoded,
 };
 use codec::Encode;
@@ -46,10 +43,7 @@ mod tests {
         error::Error,
         extrinsic::PairSigner,
         frame::balances::TransferCall,
-        tests::{
-            test_client,
-            TestRuntime,
-        },
+        tests::{test_client, TestRuntime},
     };
     use sp_keyring::AccountKeyring;
 
@@ -67,12 +61,10 @@ mod tests {
             .unwrap();
 
         let res = client.sudo_and_watch(&alice, &call).await;
-        assert!(
-            if let Err(Error::BadOrigin) = res {
-                true
-            } else {
-                false
-            }
-        );
+        assert!(if let Err(Error::BadOrigin) = res {
+            true
+        } else {
+            false
+        });
     }
 }

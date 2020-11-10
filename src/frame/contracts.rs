@@ -17,19 +17,10 @@
 //! Implements support for the pallet_contracts module.
 
 use crate::frame::{
-    balances::{
-        Balances,
-        BalancesEventsDecoder,
-    },
-    system::{
-        System,
-        SystemEventsDecoder,
-    },
+    balances::{Balances, BalancesEventsDecoder},
+    system::{System, SystemEventsDecoder},
 };
-use codec::{
-    Decode,
-    Encode,
-};
+use codec::{Decode, Encode};
 use core::marker::PhantomData;
 
 /// Gas units are chosen to be represented by u64 so that gas metering
