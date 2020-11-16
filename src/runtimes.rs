@@ -73,11 +73,6 @@ impl Contracts for DefaultNodeRuntime {}
 
 impl Sudo for DefaultNodeRuntime {}
 
-/// Assets type
-pub trait Assets: System {
-    /// The balance of an account.
-    type AssetId: codec::Codec + Default + Copy;
-}
 /// Concrete type definitions compatible with the node template.
 ///
 /// # Note
@@ -106,10 +101,6 @@ impl System for NodeTemplateRuntime {
 
 impl Balances for NodeTemplateRuntime {
     type Balance = u128;
-}
-
-impl Assets for NodeTemplateRuntime {
-    type AssetId = u32;
 }
 
 impl Sudo for NodeTemplateRuntime {}

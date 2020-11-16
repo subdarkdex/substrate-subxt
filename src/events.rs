@@ -28,6 +28,7 @@ use crate::{
     Phase, System,
 };
 
+pub type AssetId = u64;
 /// Raw bytes for an Event
 #[derive(Debug)]
 pub struct RawEvent {
@@ -56,6 +57,7 @@ impl<T: System> EventsDecoder<T> {
             marker: PhantomData,
         };
         // register default event arg type sizes for dynamic decoding of events
+        decoder.register_type_size::<Option<AssetId>>("Option<AssetId>");
         decoder.register_type_size::<()>("PhantomData");
         decoder.register_type_size::<DispatchInfo>("DispatchInfo");
         decoder.register_type_size::<bool>("bool");
